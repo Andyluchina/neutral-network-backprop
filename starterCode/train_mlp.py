@@ -24,21 +24,22 @@ def main():
         ydev = dataproc.to_one_hot(ydev,int(1+np.max(ytrain[0,:])))
 
     # Record dimensions and size of dataset.
-    N = xtrain.shape[1]
+    N = xtrain.shape[1] # size of the data
     din = xtrain.shape[0]
     dout = ytrain.shape[0]
-
+    # print(xtrain)
+    # print(ytrain)
     batch_size = args.batch_size
     if (batch_size == 0):
         batch_size = N
-    
+
     # Create an MLP object for training.
     nn = mlp.MLP(din, dout, args.hidden_units)
 
     # Evaluate MLP after initialization; yhat is matrix of dim (Dout x N).
     yhat = nn.eval(xtrain)
 
-    best_train = (analysis.mse(ytrain, yhat), 
+    best_train = (analysis.mse(ytrain, yhat),
                   analysis.mce(ytrain, yhat),
                   analysis.accuracy(ytrain, yhat)*100)
     print('Initial conditions~~~~~~~~~~~~~')
@@ -46,9 +47,9 @@ def main():
     print('mce(train):  %f'%(best_train[1]))
     print('acc(train):  %f'%(best_train[2]))
     print('')
-    
+
     if (args.dev_file is not None):
-        best_dev = (analysis.mse(ydev, yhat), 
+        best_dev = (analysis.mse(ydev, yhat),
                       analysis.mce(ydev, yhat),
                       analysis.accuracy(ydev, yhat)*100)
         print('mse(dev):  %f'%(best_dev[0]))
