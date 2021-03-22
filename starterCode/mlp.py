@@ -89,6 +89,15 @@ class MLP:
         for y in range(output.shape[1]):
             for x in range(output.shape[0]):
                 output[x][y] += self.b2[x][0]
+
+        # print(output)
+        # apply softmax to output
+        for y in range(output.shape[1]):
+            sum_of_column = 0
+            for x in range(output.shape[0]):
+                sum_of_column += math.exp(output[x][y])
+            for x in range(output.shape[0]):
+                output[x][y] = math.exp(output[x][y])/sum_of_column
         return output
 
     def sgd_step(self, xdata, ydata, learn_rate):
@@ -111,44 +120,19 @@ class MLP:
         but you might want to use finite differences for debugging.
         '''
         yhat = self.eval(xdata)
-        # print("x: ")
-        # print(xdata)
-        # print("y: ")
-        # print(ydata)
-        # print("yhat: ")
-        # print(yhat)
-        # print("a1: ")
-        # print(self.a1)
-        # print("W1: ")
-        # print(self.W1)
-        # print("W2: ")
-        # print(self.W2)
 
         delta_nplus1 = yhat - ydata
-        # print("delta2: ")
-        # print(delta_nplus1)
-        # print("z1: ")
-        # print(self.z1)
         # dw2
         dw2 = delta_nplus1.dot(self.z1.transpose())*(1/self.z1.shape[1])
-        # print("dw2: ")
-        # print(dw2)
         # db2
         h_aj1 = self.tanh(1)
         bias_vector2 = np.full((self.z1.shape[1],1),h_aj1)
         db2 = delta_nplus1.dot(bias_vector2)*(1/self.z1.shape[1])
-        # print("db2: ")
-        # print(db2)
-
         # dw1
         h_aj0 = np.copy(xdata)
         for x in range(h_aj0.shape[0]):
             for y in range(h_aj0.shape[1]):
                 h_aj0[x][y] = self.tanh((h_aj0[x][y]))
-        # print("x: ")
-        # print(xdata)
-        # print("h_aj0: ")
-        # print(h_aj0)
 
         h_prime_ak1 = np.copy(self.a1)
         for x in range(h_prime_ak1.shape[0]):
@@ -156,34 +140,11 @@ class MLP:
                 h_prime_ak1[x][y] = self.derivative_of_tanh((h_prime_ak1[x][y]))
 
         # delta_nplus1 and self.W2
-        # print("W1: ")
-        # print(self.W1)
-        # print("W2: ")
-        # print(self.W2)
-        # print("a1: ")
-        # print(self.a1)
-        # print("a0: ")
-        # print(xdata)
-        # print("delta2: ")
-        # print(delta_nplus1)
-
         sum_delta2_w2 = self.W2.transpose().dot(delta_nplus1)
         delta1 = np.multiply(h_prime_ak1, sum_delta2_w2)
         dw1 = delta1.dot(h_aj0.transpose())*(1/self.z1.shape[1])
         # db1 h_aj0 the same
         delta1_first_term = self.derivative_of_tanh(1)
         bias_vector1 = np.full((self.z1.shape[1],1), delta1_first_term)
-        # print("b1: ")
-        # print(self.b1)
-        # print("delta1: ")
-        # print(delta1)
         db1 = delta1.dot(bias_vector1)*(1/self.z1.shape[1])
-        # print("dw1: ")
-        # print(dw1)
-        # print("db1: ")
-        # print(db1)
-        # print("dw2: ")
-        # print(dw2)
-        # print("db2: ")
-        # print(db2)
         return (dw1, db1, dw2, db2)
