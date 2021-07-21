@@ -1,4 +1,5 @@
 # neutral-network-backprop
+This a implementation of a singler layer neural network
 
 analysis.py is the original file with the implementation of f score added.
 dataproc.py is unchanged.
